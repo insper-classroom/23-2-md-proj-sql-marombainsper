@@ -19,7 +19,8 @@ async def get_subscribe():
 async def create_subscribe(subscribe: SubscribeSchema):
     """Create a new subscribe"""
     subscribe_dict = subscribe.model_dump()
-    subscribe_dict['id_subcribe'] = str(uuid.uuid4())
+
+    subscribe_dict['id_subscribe'] = str(uuid.uuid4())
     if subscribe_dict['id_user'] not in members_db:
         raise HTTPException(status_code=404, detail="User not found")
     if subscribe_dict['id_plan'] not in plans_db:
@@ -41,6 +42,12 @@ async def update_subscribe(subscribe_id: str, subscribe: SubscribeSchema):
     """Update a subscribe by id"""
 
     if subscribe_id not in db:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    if subscribe.id_user not in members_db:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if subscribe.id_plan not in plans_db:
         raise HTTPException(status_code=404, detail="Plan not found")
 
     subscribe_dict = subscribe.model_dump()

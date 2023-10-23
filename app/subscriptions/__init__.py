@@ -1,5 +1,5 @@
 
-BASE_ROUTE = "subscribe"
+BASE_ROUTE = "subscriptions"
 
 def register_routes(app, root="api"):
     from .controller import router as user_router
