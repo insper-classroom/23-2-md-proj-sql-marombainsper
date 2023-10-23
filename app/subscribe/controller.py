@@ -3,6 +3,9 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 from .schema import SubscribeSchema
 from .in_memory_subscribe_database import subscribe_db as db
+
+from ..plans.in_memory_plans_database import plans_db
+from ..members.in_memory_members_database import members_db
 import uuid
 
 router = APIRouter()
@@ -17,6 +20,10 @@ async def create_subscribe(subscribe: SubscribeSchema):
     """Create a new subscribe"""
     subscribe_dict = subscribe.model_dump()
     subscribe_dict['id_subcribe'] = str(uuid.uuid4())
+    if subscribe_dict['id_user'] not in members_db:
+        raise HTTPException(status_code=404, detail="User not found")
+    if subscribe_dict['id_plan'] not in plans_db:
+        raise HTTPException(status_code=404, detail="Plan not found")
     db[subscribe_dict['id_subscribe']] = subscribe_dict
     return subscribe_dict
 
