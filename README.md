@@ -70,7 +70,11 @@ git clone https://github.com/insper-classroom/23-2-md-proj-sql-marombainsper
 ```bash
 pip install -r requirements.txt
 ```
-3.Start the development mode:
+3.Initialize database
+```
+invoke seed-db
+```
+4.Start the development mode:
 ```bash
 uvicorn wsgi:app --reload
 ```

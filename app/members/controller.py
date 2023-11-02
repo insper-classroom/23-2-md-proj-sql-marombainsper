@@ -1,8 +1,10 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from .schema import UserSchema
 from .in_memory_members_database import members_db as db
+from .service import UserService
+from app.db import get_db, Session
 import uuid
 
 router = APIRouter()
@@ -13,12 +15,9 @@ async def get_members():
     return list(db.values())
 
 @router.post('/', response_model=UserSchema)
-async def create_member(member: UserSchema):
+async def create_member(member: UserSchema, session: Session = Depends(get_db)):
     """Create a new member"""
-    member_dict = member.model_dump()
-    member_dict['id'] = str(uuid.uuid4())
-    db[member_dict['id']] = member_dict
-    return member_dict
+    return await UserService.create(member, session)
 
 @router.get('/{member_id}', response_model=UserSchema)
 async def show_member(member_id: str):

@@ -30,7 +30,7 @@ class TestingConfig(Settings):
     DEBUG: bool = True
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     TESTING: bool = True
-    SQLALCHEMY_DATABASE_URL: str = "sqlite:///{0}/app-test.db".format(basedir)
+    SQLALCHEMY_DATABASE_URL: str = "mysql+mysqlconnector://root:admin@localhost:3306/maromba-insper-test"
 
 
 class ProductionConfig(Settings):
@@ -39,7 +39,7 @@ class ProductionConfig(Settings):
     DEBUG: bool = False
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     TESTING: bool = False
-    # SQLALCHEMY_DATABASE_URL: str = "sqlite:///{0}/app-prod.db".format(basedir)
+    SQLALCHEMY_DATABASE_URL: str = "sqlite:///{0}/app-prod.db".format(basedir)
 
 
 def get_config(config):
