@@ -3,10 +3,11 @@ import os
 from invoke import task
 from app.db import get_db, Base, engine
 from app.members.model import Member
-from sqlalchemy import text
+from app.plans.model import Plan
+from app.subscriptions.model import Subscription
 
 def seed_things():
-    classes = [Member]
+    classes = [Member, Plan, Subscription]
     for klass in classes:
         seed_thing(klass)
 

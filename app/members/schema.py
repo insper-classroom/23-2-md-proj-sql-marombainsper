@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import Field
 import uuid
 
-class UserSchema(CamelModel):
+class MemberSchema(CamelModel):
     """User schema"""
     id: Optional[str] = Field(default_factory=lambda: uuid.uuid4().__str__())
     username: str

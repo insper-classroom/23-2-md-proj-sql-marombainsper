@@ -1,73 +1,68 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from .schema import PlansSchema
 from app.base import CamelModel
-from .in_memory_plans_database import plans_db as db
-from ..members.in_memory_members_database import members_db
-from ..subscriptions.in_memory_subscribe_database import subscribe_db
-from ..members.schema import UserSchema
+from ..members.schema import MemberSchema
+from .service import PlansService
+from app.db import get_db, Session
 import uuid
 
 router = APIRouter()
 
 class PlanMembersSchema(CamelModel):
-    members: List[UserSchema] = []
+    members: List[MemberSchema] = []
     plan: PlansSchema
 
 
 @router.get('/', response_model=List[PlansSchema])
-async def get_plans():
+async def get_plans(session: Session = Depends(get_db)):
     """Get all Plans"""
-    return list(db.values())
+    return await PlansService.get_all(session)
 
 @router.get('/{plan_id}/members', response_model=PlanMembersSchema)
-async def get_members_of_plan(plan_id: str):
+async def get_members_of_plan(plan_id: str, session: Session = Depends(get_db)):
     """Get all members of a plan"""
 
-    if plan_id not in db:
+    plan = await PlansService.show_plan(plan_id, session)
+    if plan:
+        members = await PlansService.get_members_of_plan(plan_id, session)
+        return PlanMembersSchema(members=members, plan=plan)
+    else:
         raise HTTPException(status_code=404, detail="Plan not found")
-    
-    members_ids = [subscribe['id_user'] for subscribe in subscribe_db.values() if subscribe['id_plan'] == plan_id]
-    return {
-        'members': [members_db[member_id] for member_id in members_ids],
-        'plan': db[plan_id]
-    }
 
 @router.post('/', response_model=PlansSchema)
-async def create_plan(plan: PlansSchema):
+async def create_plan(plan: PlansSchema, session: Session = Depends(get_db)):
     """Create a new plan"""
-    plan_dict = plan.model_dump()
-    plan_dict['id'] = str(uuid.uuid4())
-    db[plan_dict['id']] = plan_dict
-    return plan_dict
+    return await PlansService.create(plan, session)
 
 @router.get('/{plan_id}', response_model=PlansSchema)
-async def show_plan(plan_id: str):
+async def show_plan(plan_id: str, session: Session = Depends(get_db)):
     """Show a plan by id"""
 
-    if plan_id not in db:
+    resp = await PlansService.show_plan(plan_id, session)
+    if resp:
+        return resp
+    else:
         raise HTTPException(status_code=404, detail="Plan not found")
-
-    return db[plan_id]
 
 @router.put('/{plan_id}', response_model=PlansSchema)
-async def update_plan(plan_id: str, plan: PlansSchema):
+async def update_plan(plan_id: str, plan: PlansSchema, session: Session = Depends(get_db)):
     """Update a plan by id"""
 
-    if plan_id not in db:
+    resp = await PlansService.update_plan(plan_id, plan, session)
+    if resp:
+        return resp
+    else:
         raise HTTPException(status_code=404, detail="Plan not found")
-
-    plan_dict = plan.model_dump()
-    plan_dict['id'] = plan_id
-    db[plan_id] = plan_dict
-    return plan_dict
 
 @router.delete('/{plan_id}', response_model=PlansSchema)
-async def delete_plan(plan_id: str):
+async def delete_plan(plan_id: str, session: Session = Depends(get_db)
+):
     """Delete a plan by id"""
 
-    if plan_id not in db:
+    resp = await PlansService.delete_plan(plan_id, session)
+    if resp:
+        return resp
+    else:
         raise HTTPException(status_code=404, detail="Plan not found")
-
-    return db.pop(plan_id)

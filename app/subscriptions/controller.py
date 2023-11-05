@@ -2,64 +2,59 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException
 from .schema import SubscribeSchema
-from .in_memory_subscribe_database import subscribe_db as db
+from fastapi import APIRouter, HTTPException, Depends
+from app.base import CamelModel
+from ..members.schema import MemberSchema
+from app.db import get_db, Session
+from .service import SubscriptionsService
 
-from ..plans.in_memory_plans_database import plans_db
-from ..members.in_memory_members_database import members_db
-import uuid
 
 router = APIRouter()
 
 @router.get('/', response_model=List[SubscribeSchema])
-async def get_subscribe():
+async def get_subscribe(session: Session = Depends(get_db)):
     """Get all subscribe"""
-    return list(db.values())
+    return await SubscriptionsService.get_all(session)
 
 @router.post('/', response_model=SubscribeSchema)
-async def create_subscribe(subscribe: SubscribeSchema):
+async def create_subscribe(subscribe: SubscribeSchema, session: Session = Depends(get_db)):
     """Create a new subscribe"""
-    subscribe_dict = subscribe.model_dump()
-
-    subscribe_dict['id_subscribe'] = str(uuid.uuid4())
-    if subscribe_dict['id_user'] not in members_db:
-        raise HTTPException(status_code=404, detail="User not found")
-    if subscribe_dict['id_plan'] not in plans_db:
-        raise HTTPException(status_code=404, detail="Plan not found")
-    db[subscribe_dict['id_subscribe']] = subscribe_dict
-    return subscribe_dict
+    resp = await SubscriptionsService.create_subscription(subscribe, session)
+    if resp:
+        return resp
+    else:
+        raise HTTPException(status_code=400, detail="Subscription not created")
 
 @router.get('/{subscribe_id}', response_model=SubscribeSchema)
-async def show_subscribe(subscribe_id: str):
-    """Show a plan by id"""
+async def show_subscribe(subscribe_id: str, session: Session = Depends(get_db)):
+    """Show a subscription by id"""
 
-    if subscribe_id not in db:
-        raise HTTPException(status_code=404, detail="Plan not found")
-
-    return db[subscribe_id]
+    subscription = await SubscriptionsService.show_subscription(subscribe_id, session)
+    if subscription:
+        return subscription
+    else:
+        raise HTTPException(status_code=404, detail="Subscription not found")
 
 @router.put('/{subscribe_id}', response_model=SubscribeSchema)
-async def update_subscribe(subscribe_id: str, subscribe: SubscribeSchema):
+async def update_subscribe(subscribe_id: str, subscribe: SubscribeSchema, session: Session = Depends(get_db)):
     """Update a subscribe by id"""
 
-    if subscribe_id not in db:
-        raise HTTPException(status_code=404, detail="Plan not found")
-    
-    if subscribe.id_user not in members_db:
-        raise HTTPException(status_code=404, detail="User not found")
+    try:
+        subscription = await SubscriptionsService.update_subscription(subscribe_id, subscribe, session)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    if subscribe.id_plan not in plans_db:
-        raise HTTPException(status_code=404, detail="Plan not found")
-
-    subscribe_dict = subscribe.model_dump()
-    subscribe_dict['id_subscribe'] = subscribe_id
-    db[subscribe_id] = subscribe_dict
-    return subscribe_dict
+    if subscription:
+        return subscription
+    else:
+        raise HTTPException(status_code=404, detail="Subscription not found")
 
 @router.delete('/{subscribe_id}', response_model=SubscribeSchema)
-async def delete_subscribe(subscribe_id: str):
+async def delete_subscribe(subscribe_id: str, session: Session = Depends(get_db)):
     """Delete a subscribe by id"""
 
-    if subscribe_id not in db:
-        raise HTTPException(status_code=404, detail="Plan not found")
-
-    return db.pop(subscribe_id)
+    subscription = await SubscriptionsService.delete_subscription(subscribe_id, session)
+    if subscription:
+        return subscription
+    else:
+        raise HTTPException(status_code=404, detail="Subscription not found")
