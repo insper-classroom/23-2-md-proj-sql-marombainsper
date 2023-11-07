@@ -45,7 +45,7 @@ class PlansService:
     
     @staticmethod
     async def delete_plan(plan_id: str, session: Session) -> PlansSchema:
-        resp = session.query(PlansSchema).filter(PlansSchema.id == plan_id).first()
+        resp = session.query(Plan).filter(Plan.id == plan_id).first()
         if resp:
             session.delete(resp)
             session.commit()

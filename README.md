@@ -6,7 +6,6 @@ Maromba Insper microservice
 </a>
 </p>
 
-
 <p align="center">
 <img src="https://img.shields.io/github/contributors/insper-classroom/23-2-md-proj-sql-marombainsper" alt="GitHub contributors" />
 <img src="https://img.shields.io/github/discussions/insper-classroom/23-2-md-proj-sql-marombainsper" alt="GitHub discussions" />
@@ -39,7 +38,7 @@ First, let's check our diagram for this project:
 
 Check out our video demonstration of first part of the project on YouTube:
 
-[![Project Video](https://img.youtube.com/vi/V9iCq35-t98/maxresdefault.jpg)](https://www.youtube.com/watch?v=V9iCq35-t98)
+[![Project Video](https://img.youtube.com/vi/q_znljYrwo8/maxresdefault.jpg)](https://www.youtube.com/watch?v=q_znljYrwo8)
 
 
 ## 💻 Stack
@@ -64,9 +63,9 @@ Check out our video demonstration of first part of the project on YouTube:
 
 #### Your Environment Variable
 
-- Step 1
+Create local .env file on root, with the variables. Example can be found on `.env.example`.
 
-- Step 2
+**YOU NEED TO CREATE YOUR DATABASE BEFORE MANUALLY, AND IT MUST HAVE THE SAME NAME AS DEFINED ON `DB_NAME` VARIABLE**
 
 ## 🚀 Run Locally
 1.Clone the 23-2-md-proj-sql-marombainsper repository:
