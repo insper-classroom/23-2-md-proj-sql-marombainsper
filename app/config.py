@@ -2,12 +2,14 @@ import os
 from typing import List, Type
 
 from pydantic_settings import BaseSettings
-# load env dotenv
 from dotenv import load_dotenv
 load_dotenv()
 
 user_db = os.getenv("USER_DB")
 password_db = os.getenv("PASSWORD_DB")
+host_db = os.getenv("DB_HOST")
+port_db = os.getenv("DB_PORT")
+name_db = os.getenv("DB_NAME")
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -36,7 +38,7 @@ class TestingConfig(Settings):
     DEBUG: bool = True
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     TESTING: bool = True
-    SQLALCHEMY_DATABASE_URL: str = f"mysql+mysqlconnector://{user_db}:{password_db}@localhost:3306/maromba-insper-test"
+    SQLALCHEMY_DATABASE_URL: str = f"mysql+mysqlconnector://{user_db}:{password_db}@{host_db}:{port_db}/{name_db}"
 
 
 class ProductionConfig(Settings):

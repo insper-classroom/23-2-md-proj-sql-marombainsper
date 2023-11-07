@@ -20,6 +20,7 @@ Maromba Insper microservice
 ## 🔍 Table of Contents
 
 - [🔍 Table of Contents](#-table-of-contents)
+- [📝 Diagram EER](#-diagram-eer)
 - [🎥 Video](#-video)
 - [💻 Stack](#-stack)
 - [📝 Project Summary](#-project-summary)
@@ -27,6 +28,12 @@ Maromba Insper microservice
     - [Your Environment Variable](#your-environment-variable)
 - [🚀 Run Locally](#-run-locally)
 - [🙌 Contributors](#-contributors)
+
+## 📝 Diagram EER
+
+First, let's check our diagram for this project:
+
+![Diagram EER](diagram_eer.png)
 
 ## 🎥 Video
 
